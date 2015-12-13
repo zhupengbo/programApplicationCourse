@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1450019963 source:c:\users\孤舟一叶\desktop\临时\c\graphedit\main.cpp
+	<iostream>
+	<string>
+	<cstdlib>
+	<math.h>
+	<fstream>
+	<map>
+	<set>
+	<vector>
+
+1449469076 source:c:\users\孤舟一叶\desktop\临时\c\graphedit\src\triple.cpp
+
