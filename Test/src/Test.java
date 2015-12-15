@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,9 +18,10 @@ public class Test {
 	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		//Map map = new HashMap<Integer,Set<Integer>>();
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter("f:\\object2int.txt",true));
-			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("f:\\relationUrl.txt"));
+			BufferedWriter bw = new BufferedWriter(new FileWriter("f:\\object2int-v3.txt",true));
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("f:\\relationUrl-v3.txt"));
 			Map<Integer,Set<Integer>> map = (Map<Integer, Set<Integer>>) ois.readObject();
 			
 			for(Map.Entry<Integer, Set<Integer>> entry : map.entrySet()){

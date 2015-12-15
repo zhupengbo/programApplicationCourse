@@ -35,28 +35,30 @@ public class MyCrawlerFramework implements PageProcessor{
     	startList.add(startUrl);
     	MyCrawlerFramework.addVisitedUrl(startList);
         Spider.create(new MyCrawlerFramework())
+        .thread(20)
              .pipeline(new ConsolePipeline()).run();
         
-        try {
-        	StringBuilder st = new StringBuilder();
-			FileWriter fw = new FileWriter("f:\\visitedUrl.txt",true);
-			Iterator it =  visitedUrl.entrySet().iterator();
-			while(it.hasNext()){
-				Map.Entry entry = (Map.Entry)it.next(); 
-				st.append(entry.getValue()+":\t"+entry.getKey()+"\n");
-			}
-			fw.write(st.toString());
-			fw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//        try {
+//        	StringBuilder st = new StringBuilder();
+//			FileWriter fw = new FileWriter("f:\\visitedUrl-v2.txt",true);
+//			Iterator it =  visitedUrl.entrySet().iterator();
+//			while(it.hasNext()){
+//				Map.Entry entry = (Map.Entry)it.next(); 
+//				st.append(entry.getValue()+":\t"+entry.getKey()+"\n");
+//			}
+//			fw.write(st.toString());
+//			fw.close();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
     }
         @Override
         public void process(Page page) {
             List<String> toResuest = new ArrayList<String>();	
         	//System.out.println("当前页："+page.getUrl().toString());
             List<String> links = page.getHtml().links().all();
+            
             links = removeDuplate(links);//保证没有重复
             toResuest = addVisitedUrl(links);//没有已被访问的url
             addDegree(links,page.getUrl().toString());
@@ -65,12 +67,10 @@ public class MyCrawlerFramework implements PageProcessor{
    
             page.addTargetRequests(toResuest);
 //            System.out.println(links.size());
-//            for(int i = 0 ;i< links.size();i++){
-//            	System.out.println(links.get(i));
-//            }
-//	            page.putField("title", page.getHtml().xpath("//a/@href").toString());
-//	            page.putField("content", page.getHtml().$("div.content").toString());
-//	            page.putField("tags",page.getHtml().xpath("//div[@class='BlogTags']/a/text()").all());
+//            for(int i = 0 ;i< 20;i++){
+//            	System.out.println(links.get(i)+"   *****");
+//           }
+            
         }
 
         @Override
@@ -81,12 +81,18 @@ public class MyCrawlerFramework implements PageProcessor{
 
 	        
 	        public static List removeDuplate(List<String> list){
-	        	Set<String> tempSet = new HashSet(list);
+	        	/*Set<String> tempSet = new HashSet(list);
 	        	list.clear();
 	        	for(String temp : tempSet){
 	        		list.add(temp);
+	        	}*/
+	        	List temp = new ArrayList<String>();
+	        	for(String str : list){
+	        		if(!temp.contains(str)){
+	        			temp.add(str);
+	        		}
 	        	}
-	        	return list;
+	        	return temp;
 	        }
 	        public static List<String> bloomFilter(List<String> list){
 	        	//布隆过滤器
@@ -96,7 +102,7 @@ public class MyCrawlerFramework implements PageProcessor{
 	        	List<String> returnList = new ArrayList<String>();
     			FileWriter fw = null;
 				try {
-					fw = new FileWriter("f:\\visitedUrl.txt",true);
+					fw = new FileWriter("f:\\visitedUrl-v3.txt",true);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -125,7 +131,7 @@ public class MyCrawlerFramework implements PageProcessor{
 
 	        	return returnList;
 	        }
-	        public static void addDegree(List<String> list , String from){
+	        public static synchronized void addDegree(List<String> list , String from){
 	        	Integer fromId = (Integer) visitedUrl.get(from);
 	        	
 	        	for(String tempUrl : list){
@@ -143,12 +149,12 @@ public class MyCrawlerFramework implements PageProcessor{
         			
 	        	}
 	        	if(count > 160000){
-        			try {
+        			 try {
 //        				FileWriter fw = new FileWriter("f:\\relationUrl.txt",true);
 //        				fw.write(degree.toString()+"\n");
 //        				fw.flush();
 //        				fw.close();
-        				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("f:\\relationUrl.txt"));
+        				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("f:\\relationUrl-v3.txt"));
         				oos.writeObject(degree);
         				oos.flush();
         				oos.close();
