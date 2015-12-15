@@ -9,20 +9,20 @@
 using namespace std;
 #define ERROR 0
 #define OK 1
-#define MAXSIZE 130000000
+#define MAXSIZE 40000000
 #define N 170000
 #define DELT 1e-5
 //typedef double ElemType;
-typedef struct{//ÈıÔª×é½á¹¹
-    int i,j;//·ÇÁãÔªËØĞĞÏÂ±êºÍÁĞÏÂ±ê
-    double e;//·ÇÁãÔªËØÖµ
+typedef struct{//ä¸‰å…ƒç»„ç»“æ„
+    int i,j;//éé›¶å…ƒç´ è¡Œä¸‹æ ‡å’Œåˆ—ä¸‹æ ‡
+    double e;//éé›¶å…ƒç´ å€¼
 }Triple;
 typedef struct{
-    Triple data[MAXSIZE+1];//·ÇÁãÔªÈıÔª×é±í£¬data[0]²»ÓÃ
+    Triple data[MAXSIZE+1];//éé›¶å…ƒä¸‰å…ƒç»„è¡¨ï¼Œdata[0]ä¸ç”¨
     int mu,nu,tu;
 }TSMatrix;
 TSMatrix NewMatrix(int m,int n){
-    //ĞÂ½¨Ò»¸öÈıÔª×é±íÊ¾µÄÏ¡Êè¾ØÕó
+    //æ–°å»ºä¸€ä¸ªä¸‰å…ƒç»„è¡¨ç¤ºçš„ç¨€ç–çŸ©é˜µ
     TSMatrix M;
     M.mu=m;
     M.nu=n;
@@ -59,33 +59,34 @@ void split(const string& src, const string& separator, vector<string>& dest)
 int insertTriple(TSMatrix *M,int row,int col,double e){
     int i,t,p;
     if(M->tu>=MAXSIZE){
-        cout<<"Êı¾İÒÑÂú"<<endl;
+        cout<<"æ•°æ®å·²æ»¡"<<endl;exit(0);
         return ERROR;
     }
-    if(row>M->mu||col>M->nu||row<1||col<1){
-        cout<<"ĞĞÁĞË÷Òı´íÎó"<<endl;
+    if(row>M->mu||col>M->nu||row<0||col<0){
+        bool b1 = row > M->mu;bool b2 = col > M->nu;
+        cout<<M->mu<<" "<<M->nu<<" "<<"1è¡Œåˆ—ç´¢å¼•é”™è¯¯"<<endl;exit(0);
     }
     p = 1;
-    if(M->tu==0){//²åÈëÇ°¾ØÕóMÃ»ÓĞ·ÇÁãÔªËØ
+    if(M->tu==0){//æ’å…¥å‰çŸ©é˜µMæ²¡æœ‰éé›¶å…ƒç´ 
         M->data[p].i=row;
         M->data[p].j=col;
         M->data[p].e=e;
         M->tu++;
         return OK;
     }
-    for(t=1;t<=M->tu;t++)//Ñ°ÕÒºÏÊÊµÄ²åÈëÎ»ÖÃ
+    for(t=1;t<=M->tu;t++)//å¯»æ‰¾åˆé€‚çš„æ’å…¥ä½ç½®
         if((row>=M->data[t].i)&&(col>=M->data[t].j))
                 p++;
-    if(row==M->data[t-1].i && col==M->data[t-1].j){//²åÈëÇ°£¬¸ÃÔªËØÒÑ¾­´æÔÚ
+    if(row==M->data[t-1].i && col==M->data[t-1].j){//æ’å…¥å‰ï¼Œè¯¥å…ƒç´ å·²ç»å­˜åœ¨
         M->data[t-1].e=e;
         return OK;
     }
-    for(i=M->tu;i>=p;i--){//ÒÆ¶¯pÖ®ºóµÄÔªËØ
+    for(i=M->tu;i>=p;i--){//ç§»åŠ¨pä¹‹åçš„å…ƒç´ 
         M->data[i+1].i=M->data[i].i;
         M->data[i+1].j=M->data[i].j;
         M->data[i+1].e=M->data[i].e;
     }
-    //²åÈëĞÂÔªËØ
+    //æ’å…¥æ–°å…ƒç´ 
     M->data[p].i=row;
     M->data[p].j=col;
     M->data[p].e=e;
@@ -93,10 +94,10 @@ int insertTriple(TSMatrix *M,int row,int col,double e){
     return OK;
 }
 void PrintSMatrix(const TSMatrix *M){
-    //´òÓ¡Ï¡Êè¾ØÕóËùÓĞÔªËØ
+    //æ‰“å°ç¨€ç–çŸ©é˜µæ‰€æœ‰å…ƒç´ 
     int i,j,p=1;
-    cout<<"\nsize:"<<M->mu <<" ¡Á "<< M->nu<<endl;
-    if(!M->tu){//0¾ØÕó
+    cout<<"\nsize:"<<M->mu <<" Ã— "<< M->nu<<endl;
+    if(!M->tu){//0çŸ©é˜µ
         cout<<0<<endl;
         return;
     }
@@ -117,32 +118,39 @@ void PrintSMatrix(const TSMatrix *M){
 double slove(double v[N])
 {
     double max;
-    for(int i=0;i<N-1;i++) max=v[i]>v[i+1]?v[i]:v[i+1];
+    for(int i=0;i<N;i++) //{max=v[i]>max?v[i]:max;}
+        max += v[i];
+    //cout<<max<<"::::"<<v[0]<<endl;
     return max;
 }
-//Ï¡Êè¾ØÕóµÄÃİ·¨
-void powerInter(const TSMatrix M,double X[N],double Y[N]){
+//ç¨€ç–çŸ©é˜µçš„å¹‚æ³•
+void powerInter(const TSMatrix *M,double X[N],double Y[N]){
+    //for(int i = 0 ; i <N;i++)cout<<X[i]<<"::"<<endl;
     //double Y[];
     while(1){
 
-        for(int i = 0 ; i<N ; i++){
+        int slo = slove(X);
+       for(int p = 1 ; p <= M->tu ; p++){
+            Triple temp = M->data[p];
+            Y[temp.i-1] += (temp.e * X[temp.j-1])/slo;
+       }
+       for(int q = 0 ; q < N ;q++){
+            Y[q] += X[q]*0.15/N/slo;
+       }//exit(0);
+       //cout<<slo<<" "<<slove(X)<<" "<<slove(Y)<<" "<<fabs(slove(X)-slove(Y))<<endl;
+       if(fabs(slove(X)-slove(Y))<DELT){break;}
+       for(int i = 0 ; i<N ; i++){
             X[i] = Y[i];
             Y[i] = 0;
         }
-       for(int p = 1 ; p <= M.tu ; p++){
-            Triple temp = M.data[p];
-            Y[temp.i-1] += (temp.e * X[temp.j-1])/slove(X);
-       }
-       //<<fabs(slove(X)-slove(Y))<<endl;
-       if(fabs(slove(X)-slove(Y))<DELT){break;}
     }
 }
 //
-void initX(TSMatrix M , double X[] , double Y[]){
+void initX(TSMatrix M , double X[]){
     for(int p = 1 ; p <= M.tu ; p++){
         int temp = M.data[p].j-1;
         //if(X[temp] == 0){
-        X[temp] = Y[temp] = 1;
+        X[temp]  = 1;
        // }
     }
 }
@@ -156,12 +164,13 @@ void readDataFromFile(char* filePath ,TSMatrix* M){
         int pos = line.find(':');
         int col = atoi((line.substr(0,pos)).c_str());
         int start = line.find('[');
-        int end = line.find(']');
-        const string rows = line.substr(start,end);
+        int end1 = line.find(']');
+        const string rows = line.substr(start+1,end1);
         vector<string> tokens;
         split(rows,",",tokens);
         for(int i = 0 ; i < tokens.size() ;i++){
-            //insertTriple(M,atoi(tokens[i].c_str()),col,1);
+                cout<<atoi(tokens[i].c_str())<<":"<<col<<endl;
+            insertTriple(M,atoi(tokens[i].c_str()),col,0.85*1.0/tokens.size());
         }
 
         //char key[1024]={0};
@@ -171,43 +180,67 @@ void readDataFromFile(char* filePath ,TSMatrix* M){
         //in>>key;
         //in.read((set)value,sizeof(value));//>>value;
         //resultMap.insert(make_pair(key,value));
-        cout<<col<<"\t@"<<tokens.size()<<"&&&"<<line<<endl;
+        //cout<<col<<"\t@"<<tokens.size()<<"&&&"<<line<<endl;
     }
 }
+
 int main()
 {
-    //Triple data[130000000];
-    cout<<sizeof(double)*160000/1024.0/1024<<endl;
-    cout<<sizeof(TSMatrix)/1024.0/1024<<endl;
-    //char* filePath = "f:\\object2int.txt";
-    //TSMatrix M = NewMatrix(N,N);
-    //readDataFromFile(filePath , &M);
-
-    TSMatrix* M = (TSMatrix*)malloc(sizeof(TSMatrix));//=NewMatrix(N,N);
+/*
+    char* filePath = "./object2int-v3.txt";
+    TSMatrix* M = (TSMatrix*)malloc(sizeof(TSMatrix));
     newMatrix(M,N,N);
+    readDataFromFile(filePath , M);
     cout<<M<<endl;
-   // TSMatrix T=NewMatrix(N,N);
-    insertTriple(M,1,1,1);
-    insertTriple(M,1,2,1);
-    insertTriple(M,1,3,0.5);
-    insertTriple(M,2,1,1);
-    insertTriple(M,2,2,1);
-    insertTriple(M,2,3,0.25);
-    insertTriple(M,3,1,0.5);
-    insertTriple(M,3,2,0.25);
-    insertTriple(M,3,3,2);
-
-    //³õÊ¼»¯X
-    double X[N]={0},Y[N]={0},Y2[N]={0};
-    initX(*M,X,Y);
-    powerInter(*M,X,Y);
-    initX(*M,X,Y2);
-    powerInter(*M,X,Y2);
-    //cout<<"X:\n";
+/*
+    ofstream out("./res3.txt");
+    //åˆå§‹åŒ–X
+    double X[N],Y[N]={0};
+    for(int i =0 ; i<N;i++)X[i] = 1;
+    powerInter(M,X,Y);
     for(int i = 0; i < N;i++){
-        cout<<Y[i]+Y2[i]<<endl;
+        out<<Y[i]<<endl;
+    }
+    for(int i = 0 ; i<10;i++){
+        double max  = Y[i] ; int index = i ;
+        for(int j = 0 ; j <N;j++){
+            if(max < Y[j]){
+                max = Y[j];
+                index = j;
+            }
+        }
+        cout<<index<<endl;
+        Y[index] = 0;
     }
     //cout<<"\nM:";
-    //PrintSMatrix(&M);*/
+    //PrintSMatrix(&M);
+*/
+
+    double X[N];
+    ifstream in("./res3.txt");
+    for(int i = 0 ; i< N;i++){
+        in>>X[i];
+        //cout<<X[i]<<endl;//exit(0);
+    }
+
+    ifstream inVisited("./visitedUrl-v3.txt");
+    string url[N];int h  = 0;
+    while(getline(inVisited , url[h++])){
+
+    }
+
+    int index[10];
+    //double X[10] = {0,1,2,3,4,5,9,7,6,8};
+    for(int i = 0 ; i<10;i++){
+        double max  = X[i] ; //int index = i ;
+        for(int j = 0 ; j <N;j++){
+            if(max < X[j]){
+                max = X[j];
+                index[i] = j;
+            }
+        }
+        cout<<url[index[i]]<<" : "<<max<<endl;
+        X[index[i]] = 0;
+    }
 
 }

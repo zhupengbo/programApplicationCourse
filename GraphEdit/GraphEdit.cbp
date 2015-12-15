@@ -32,12 +32,9 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="include/Triple.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="src/Triple.cpp" />
 		<Extensions>
 			<code_completion />
-			<envvars />
 			<debugger />
 		</Extensions>
 	</Project>
